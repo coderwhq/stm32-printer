@@ -1,0 +1,5 @@
+software/Listings/*
+software/Objects/*
+software/DebugConfig/*
+
+*.log
