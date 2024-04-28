@@ -2,4 +2,6 @@ software/Listings/*
 software/Objects/*
 software/DebugConfig/*
 
+*.xmind
+
 *.log

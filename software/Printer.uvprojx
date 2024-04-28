@@ -667,6 +667,48 @@
         </Group>
         <Group>
           <GroupName>Hardware</GroupName>
+          <Files>
+            <File>
+              <FileName>A4988.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\A4988.c</FilePath>
+            </File>
+            <File>
+              <FileName>A4988.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\A4988.h</FilePath>
+            </File>
+            <File>
+              <FileName>LED.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\LED.c</FilePath>
+            </File>
+            <File>
+              <FileName>LED.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\LED.h</FilePath>
+            </File>
+            <File>
+              <FileName>MySPI.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\MySPI.c</FilePath>
+            </File>
+            <File>
+              <FileName>MySPI.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\MySPI.h</FilePath>
+            </File>
+            <File>
+              <FileName>PrinterHead.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\PrinterHead.c</FilePath>
+            </File>
+            <File>
+              <FileName>PrinterHead.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\PrinterHead.h</FilePath>
+            </File>
+          </Files>
         </Group>
         <Group>
           <GroupName>User</GroupName>
