@@ -1,7 +1,9 @@
 #include "stm32f10x.h"
 
+#define ACTIVE_HIGH_LEVEL 0
+
 // 如果没有高电平使能的宏定义
-#ifndef ACTIVE_HIGH_LEVEL
+#if !ACTIVE_HIGH_LEVEL
 // 那么默认使用低电平使能
 #define LED_ON_LEVEL (BitAction)0
 #define LED_OFF_LEVEL (BitAction)1

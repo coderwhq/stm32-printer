@@ -1,6 +1,6 @@
 #include "stm32f10x.h"
 /* SPI */
-#define USE_SPI_PERIPH // 使用硬件SPI
+#define USE_SPI_PERIPH 1 // 使用硬件SPI
 
 #define SPI_RCC RCC_APB2Periph_SPI1
 #define SPI_RCC_GPIO RCC_APB2Periph_GPIOA
@@ -10,7 +10,7 @@
 #define SPI_MISO_PIN GPIO_Pin_6
 #define SPI_MOSI_PIN GPIO_Pin_7
 
-#ifdef USE_SPI_PERIPH
+#if USE_SPI_PERIPH
 
 #define SPI_X SPI1
 
@@ -37,14 +37,14 @@ void MySPI_Init(void)
 {
 
     GPIO_InitTypeDef GPIO_InitStructure;
-#ifdef USE_SPI_PERIPH
+#if USE_SPI_PERIPH
     SPI_InitTypeDef SPI_InitStructure;
     RCC_APB2PeriphClockCmd(SPI_RCC, ENABLE);
 #endif
     RCC_APB2PeriphClockCmd(SPI_RCC_GPIO, ENABLE);
 
     GPIO_InitStructure.GPIO_Mode =
-#ifdef USE_SPI_PERIPH
+#if USE_SPI_PERIPH
         GPIO_Mode_AF_PP;
 #else
         GPIO_Mode_Out_PP;
@@ -59,7 +59,7 @@ void MySPI_Init(void)
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 
     GPIO_Init(SPI_PINS_PORT, &GPIO_InitStructure);
-#ifdef USE_SPI_PERIPH
+#if USE_SPI_PERIPH
     SPI_StructInit(&SPI_InitStructure);
 
     SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
@@ -83,7 +83,7 @@ void MySPI_Init(void)
 
 uint8_t MySPI_SwapByte(uint8_t byte)
 {
-#ifdef USE_SPI_PERIPH
+#if USE_SPI_PERIPH
     /* 硬件SPI交换字节 */
     while (SPI_I2S_GetFlagStatus(SPI_X, SPI_I2S_FLAG_TXE) != SET) // 发送缓冲区不为空时等待
     {
