@@ -18,15 +18,15 @@ void AppTaskCreate(void *parameter);
 void TestLED_Task(void *parameter);
 
 /* Task functions handle definitions */
-TaskHandle_t AppTaskCreate_Handle = NULL;
-TaskHandle_t TestLED_Task_Handle = NULL;
+TaskHandle_t appTaskCreateHandle = NULL;
+TaskHandle_t testLEDFlashTaskHandle = NULL;
 
 int main(void)
 {
     BaseType_t xReturn = pdPASS;
     Peripherals_Init();
 
-    xReturn = xTaskCreate(AppTaskCreate, "AppTaskCreate", 128, NULL, 1, &AppTaskCreate_Handle);
+    xReturn = xTaskCreate(AppTaskCreate, "AppTaskCreate", 128, NULL, 1, &appTaskCreateHandle);
 
     if (xReturn == pdPASS)
     {
@@ -55,13 +55,13 @@ void AppTaskCreate(void *parameter)
     BaseType_t xReturn = pdPASS;
     taskENTER_CRITICAL();
 
-    xReturn = xTaskCreate(TestLED_Task, "TestLED_Task", 128, NULL, 2, &TestLED_Task_Handle);
+    xReturn = xTaskCreate(TestLED_Task, "TestLED_Task", 128, NULL, 2, &testLEDFlashTaskHandle);
     if (xReturn != pdPASS)
     {
         /* ¥ÌŒÛ¥¶¿Ì */
     }
 
-    vTaskDelete(AppTaskCreate_Handle);
+    vTaskDelete(appTaskCreateHandle);
     taskEXIT_CRITICAL();
 }
 
