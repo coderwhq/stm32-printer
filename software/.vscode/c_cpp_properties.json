@@ -7,7 +7,9 @@
                 "${workspaceFolder}/Start",
                 "${workspaceFolder}/User",
                 "${workspaceFolder}/System",
-                "${workspaceFolder}/Hardware"
+                "${workspaceFolder}/Hardware",
+                "${workspaceFolder}/FreeRTOS/include",
+                "${workspaceFolder}/FreeRTOS/portable/RVDS/ARM_CM3"
             ],
             "defines": [
                 "USE_STDPERIPH_DRIVER",
