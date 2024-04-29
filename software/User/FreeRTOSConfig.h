@@ -31,7 +31,8 @@
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
 
-#define configSUPPORT_DYNAMIC_ALLOCATION 1 // 使用自动分配，默认也是1
+#define configSUPPORT_DYNAMIC_ALLOCATION 1 /* 使用自动分配，默认也是1 */
+#define configUSE_MUTEXES 1                /* 使用互斥量 */
 
 /*-----------------------------------------------------------
  * Application specific definitions.
