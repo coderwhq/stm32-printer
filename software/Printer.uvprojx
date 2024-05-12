@@ -764,6 +764,11 @@
               <FilePath>.\Hardware\MySPI.h</FilePath>
             </File>
             <File>
+              <FileName>FontBitmap.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\FontBitmap.h</FilePath>
+            </File>
+            <File>
               <FileName>PrinterHead.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\Hardware\PrinterHead.c</FilePath>
@@ -772,6 +777,16 @@
               <FileName>PrinterHead.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\PrinterHead.h</FilePath>
+            </File>
+            <File>
+              <FileName>PrinterMoto.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\PrinterMoto.c</FilePath>
+            </File>
+            <File>
+              <FileName>PrinterMoto.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\PrinterMoto.h</FilePath>
             </File>
             <File>
               <FileName>Serial.c</FileName>
