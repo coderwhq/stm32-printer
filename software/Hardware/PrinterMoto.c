@@ -54,10 +54,10 @@ void PrinterMoto_Stop(void)
     GPIO_WriteBit(PRINTER_MOTO_PORT, PRINTER_B2, (BitAction)0); /* B- */
 }
 
-void PrinterMoto_Run_Circle(uint8_t times)
+void PrinterMoto_Run_Circle(uint16_t times)
 {
     static uint8_t motor = 0; // 为保证下次进入函数时motor和上次退出函数的值一样，所以使用静态变量
-    uint8_t i;
+    uint16_t i;
 
     for (i = 0; i < times; i++)
     {
