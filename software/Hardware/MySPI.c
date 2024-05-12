@@ -16,7 +16,7 @@
 
 #else
 
-void MYSPI_Write_SCK(uint8_t bit)
+void MySPI_Write_SCK(uint8_t bit)
 {
     GPIO_WriteBit(SPI_PINS_PORT, SPI_SCK_PIN, (BitAction)bit);
 }
@@ -77,7 +77,7 @@ void MySPI_Init(void)
     SPI_Cmd(SPI_X, ENABLE);
 #else
     /* 采用00模式传输，所以时钟默认为低电平 */
-    MYSPI_Write_SCK(0);
+    MySPI_Write_SCK(0);
 #endif
 }
 
