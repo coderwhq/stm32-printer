@@ -1,16 +1,9 @@
 #include "FreeRTOS.h"
+#include "UserConfig.h"
 #include "delay.h"
 #include "serial.h"
 #include "stm32f10x.h"
 #include "task.h"
-
-#define PRINTER_MOTO_RCC_GPIO RCC_APB2Periph_GPIOB
-#define PRINTER_MOTO_PORT GPIOB
-
-#define PRINTER_A1 GPIO_Pin_9 /* Pin9 -> AMIN1 -> AMOUT1 -> A+ -> 28 */
-#define PRINTER_A2 GPIO_Pin_8 /* Pin8 -> AMIN2 -> AMOUT2 -> A- -> 27 */
-#define PRINTER_B1 GPIO_Pin_7 /* Pin7 -> BMIN1 -> BMOUT1 -> B+ -> 30 */
-#define PRINTER_B2 GPIO_Pin_6 /* Pin6 -> BMIN2 -> BMOUT2 -> B- -> 29 */
 
 /*
     {A, B, A-, B-}
@@ -62,7 +55,7 @@ void PrinterMoto_Run_Circle(uint16_t times)
     for (i = 0; i < times; i++)
     {
         PrinterMoto_Run(motor);
-        Delay_us(4000); // 1s / 4ms = 250   250Hz
+        Delay_us(PRINTER_MOTO_DELAY); // 1s / 4ms = 250   250Hz
         motor++;
         if (motor >= 8)
         {

@@ -1,28 +1,10 @@
-#include "PrinterHead.h"
 #include "Delay.h"
 #include "MySPI.h"
 #include "PrinterMoto.h"
+#include "UserConfig.h"
 #include "stm32f10x.h"
 
 /* JX-2R-01 */
-#define PRINTER_LAT_RCC_GPIO RCC_APB2Periph_GPIOB
-#define PRINTER_LAT_PORT GPIOB
-#define PRINTER_LAT_PIN GPIO_Pin_1
-
-#define PRINTER_STB_RCC_GPIO RCC_APB2Periph_GPIOB
-#define PRINTER_STB_PORT GPIOB
-#define PRINTER_STB1_PIN GPIO_Pin_10
-#define PRINTER_STB2_PIN GPIO_Pin_11
-#define PRINTER_STB3_PIN GPIO_Pin_12
-#define PRINTER_STB4_PIN GPIO_Pin_13
-#define PRINTER_STB5_PIN GPIO_Pin_14
-#define PRINTER_STB6_PIN GPIO_Pin_15
-#define PRINTER_STB_PINS                                                                                               \
-    PRINTER_STB1_PIN | PRINTER_STB2_PIN | PRINTER_STB3_PIN | PRINTER_STB4_PIN | PRINTER_STB5_PIN | PRINTER_STB6_PIN
-
-#define HEAT_TIME 20
-#define LAT_TIME 1
-#define DOTLINE_SIZE 48
 
 uint8_t dotLine[DOTLINE_SIZE] = {0};
 
@@ -112,7 +94,7 @@ void PrinterHead_Heat_Circle(void)
 void PrinterHead_ClearDotLineArray(void)
 {
     uint8_t i;
-    for (i = 0; i < 48; i++)
+    for (i = 0; i < DOTLINE_SIZE; i++)
     {
         dotLine[i] = 0;
     }

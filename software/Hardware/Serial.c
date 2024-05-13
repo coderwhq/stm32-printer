@@ -1,15 +1,7 @@
+#include "UserConfig.h"
 #include "stm32f10x.h"
 #include <stdarg.h>
 #include <stdio.h>
-
-#define SERIAL_USART_X USART2
-
-#define SERIAL_RCC RCC_APB1Periph_USART2
-#define SERIAL_RCC_GPIO RCC_APB2Periph_GPIOA
-
-#define SERIAL_PINS_PORT GPIOA
-#define SERIAL_TX_PIN GPIO_Pin_2
-#define SERIAL_RX_PIN GPIO_Pin_3
 
 char serialReceiveString[100];
 uint8_t serialReceiveFlag;

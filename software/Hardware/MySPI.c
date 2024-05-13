@@ -1,20 +1,9 @@
+#include "UserConfig.h"
 #include "stm32f10x.h"
+
 /* SPI */
-#define USE_SPI_PERIPH 1 //  π”√”≤º˛SPI
 
-#define SPI_RCC RCC_APB2Periph_SPI1
-#define SPI_RCC_GPIO RCC_APB2Periph_GPIOA
-
-#define SPI_PINS_PORT GPIOA
-#define SPI_SCK_PIN GPIO_Pin_5
-#define SPI_MISO_PIN GPIO_Pin_6
-#define SPI_MOSI_PIN GPIO_Pin_7
-
-#if USE_SPI_PERIPH
-
-#define SPI_X SPI1
-
-#else
+#if !USE_SPI_PERIPH
 
 void MySPI_Write_SCK(uint8_t bit)
 {

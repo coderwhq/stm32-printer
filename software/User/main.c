@@ -82,8 +82,6 @@ void AppTaskCreate(void *parameter)
 
     AppSemaphoreCreate(); /* 创建所有要用的信号量 */
 
-    PrinterMoto_Run_Circle(4000);
-
     xReturn = xTaskCreate(TestLED_Task, "TestLED_Task", 128, NULL, 2, &testLEDFlashTaskHandle);
     if (xReturn != pdPASS)
     {

@@ -1,6 +1,5 @@
+#include "UserConfig.h"
 #include "stm32f10x.h"
-
-#define ACTIVE_HIGH_LEVEL 0
 
 // 如果没有高电平使能的宏定义
 #if !ACTIVE_HIGH_LEVEL
@@ -14,10 +13,6 @@
 #define LED_OFF_LEVEL (BitAction)0
 
 #endif
-
-#define LED_RCC_GPIO RCC_APB2Periph_GPIOB
-#define LED_PORT GPIOB
-#define LED_PIN GPIO_Pin_0
 
 void LED_Init(void)
 {
