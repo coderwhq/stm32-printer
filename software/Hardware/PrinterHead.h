@@ -6,5 +6,6 @@ extern uint8_t dotLine[];
 
 void PrinterHead_Init(void);
 void PrinterHead_PrintDotLine(void);
+void PrinterHead_PrintBlankLine(void);
 
 #endif

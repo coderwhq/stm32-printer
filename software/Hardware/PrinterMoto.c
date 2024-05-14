@@ -1,6 +1,5 @@
 #include "FreeRTOS.h"
 #include "UserConfig.h"
-#include "delay.h"
 #include "serial.h"
 #include "stm32f10x.h"
 #include "task.h"
@@ -55,7 +54,7 @@ void PrinterMoto_Run_Circle(uint16_t times)
     for (i = 0; i < times; i++)
     {
         PrinterMoto_Run(motor);
-        Delay_us(PRINTER_MOTO_DELAY); // 1s / 4ms = 250   250Hz
+        vTaskDelay(PRINTER_MOTO_DELAY / 1000); // 1s / 4ms = 250   250Hz
         motor++;
         if (motor >= 8)
         {

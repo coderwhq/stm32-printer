@@ -1,8 +1,9 @@
-#include "Delay.h"
+#include "FreeRTOS.h"
 #include "MySPI.h"
 #include "PrinterMoto.h"
 #include "UserConfig.h"
 #include "stm32f10x.h"
+#include "task.h"
 
 /* JX-2R-01 */
 
@@ -33,6 +34,8 @@ void PrinterHead_Init(void)
     GPIO_Init(PRINTER_STB_PORT, &GPIO_InitStructure);
     // 默认不启用脉冲，低电平关闭
     GPIO_ResetBits(PRINTER_STB_PORT, PRINTER_STB_PINS);
+
+    PrinterMoto_Init(); // 打印头moto初始化
 }
 /*
     每行384个点，每个STB控制64个点。
@@ -67,27 +70,27 @@ void PrinterHead_Heat_Disable(void)
 void PrinterHead_Heat_Circle(void)
 {
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB1_PIN, (BitAction)1); // Enable
-    Delay_ms(HEAT_TIME);
+    vTaskDelay(HEAT_TIME);
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB1_PIN, (BitAction)0); // Disable
 
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB2_PIN, (BitAction)1);
-    Delay_ms(HEAT_TIME);
+    vTaskDelay(HEAT_TIME);
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB2_PIN, (BitAction)0);
 
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB3_PIN, (BitAction)1);
-    Delay_ms(HEAT_TIME);
+    vTaskDelay(HEAT_TIME);
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB3_PIN, (BitAction)0);
 
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB4_PIN, (BitAction)1);
-    Delay_ms(HEAT_TIME);
+    vTaskDelay(HEAT_TIME);
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB4_PIN, (BitAction)0);
 
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB5_PIN, (BitAction)1);
-    Delay_ms(HEAT_TIME);
+    vTaskDelay(HEAT_TIME);
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB5_PIN, (BitAction)0);
 
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB6_PIN, (BitAction)1);
-    Delay_ms(HEAT_TIME);
+    vTaskDelay(HEAT_TIME);
     GPIO_WriteBit(PRINTER_STB_PORT, PRINTER_STB6_PIN, (BitAction)0);
 }
 
@@ -109,7 +112,7 @@ void PrinterHead_SendDotLineData(void)
         temp = MySPI_SwapByte(dotLine[i]);
     }
     PrinterHead_LAT_Enable();
-    Delay_ms(LAT_TIME);
+    vTaskDelay(LAT_TIME);
     PrinterHead_LAT_Disable();
     PrinterHead_ClearDotLineArray(); // 自动清除dotLine，方便外界继续向dotLine中放入数据
 }
@@ -119,11 +122,16 @@ void PrinterHead_PrintDotLine(void)
     PrinterHead_SendDotLineData();
 
     // PrinterHead_Heat_Enable();
-    // Delay_ms(HEAT_TIME);
+    // vTaskDelay(HEAT_TIME);
     // PrinterHead_Heat_Disable();
 
     // 电压不够时可以使用这个函数加热
     PrinterHead_Heat_Circle();
 
     PrinterMoto_Run_Circle(4);
+}
+
+void PrinterHead_PrintBlankLine(void)
+{
+    PrinterMoto_Run_Circle(BlankDotLine);
 }
