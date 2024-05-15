@@ -121,12 +121,13 @@ void PrinterHead_PrintDotLine(void)
 {
     PrinterHead_SendDotLineData();
 
-    // PrinterHead_Heat_Enable();
-    // vTaskDelay(HEAT_TIME);
-    // PrinterHead_Heat_Disable();
-
-    // 电压不够时可以使用这个函数加热
+#if !USE_CIRCLE_HEAT
+    PrinterHead_Heat_Enable();
+    vTaskDelay(HEAT_TIME);
+    PrinterHead_Heat_Disable();
+#else
     PrinterHead_Heat_Circle();
+#endif
 
     PrinterMoto_Run_Circle(4);
 }
@@ -134,4 +135,14 @@ void PrinterHead_PrintDotLine(void)
 void PrinterHead_PrintBlankLine(void)
 {
     PrinterMoto_Run_Circle(BlankDotLine);
+}
+
+void PrinterHead_PrintLineSpace(void)
+{
+    PrinterMoto_Run_Circle(LINE_SPACE);
+}
+
+void PrinterHead_PrintSegmentSpace(void)
+{
+    PrinterMoto_Run_Circle(SEGMENT_SPACE);
 }
