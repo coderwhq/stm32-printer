@@ -3,6 +3,10 @@
 
 /* User Global */
 
+#define MAX_PRINT_BYTE 1024 // 最大能打印多少个字节
+#define FONTSIZE 32
+#define ASCII 0x1078D0L // ASCII字体在每种字体中的偏移量
+
 /* LED */
 #define ACTIVE_HIGH_LEVEL 0
 
@@ -22,25 +26,46 @@
 #define SPI_MISO_PIN GPIO_Pin_6
 #define SPI_MOSI_PIN GPIO_Pin_7
 
+/* MySPI2 */
+
+#define SPI2_X SPI2
+#define SPI2_RCC RCC_APB1Periph_SPI2
+#define SPI2_RCC_GPIO RCC_APB2Periph_GPIOB
+
+#define SPI2_PINS_PORT GPIOB
+#define SPI2_SS_PIN GPIO_Pin_12
+#define SPI2_SCK_PIN GPIO_Pin_13
+#define SPI2_MISO_PIN GPIO_Pin_14
+#define SPI2_MOSI_PIN GPIO_Pin_15
+
 /* PrinterHead */
 #define PRINTER_LAT_RCC_GPIO RCC_APB2Periph_GPIOB
 #define PRINTER_LAT_PORT GPIOB
 #define PRINTER_LAT_PIN GPIO_Pin_1
 
-#define PRINTER_STB_RCC_GPIO RCC_APB2Periph_GPIOB
-#define PRINTER_STB_PORT GPIOB
-#define PRINTER_STB1_PIN GPIO_Pin_10
-#define PRINTER_STB2_PIN GPIO_Pin_11
-#define PRINTER_STB3_PIN GPIO_Pin_12
-#define PRINTER_STB4_PIN GPIO_Pin_13
-#define PRINTER_STB5_PIN GPIO_Pin_14
+#define PRINTER_STB_RCC_GPIO RCC_APB2Periph_GPIOA
+#define PRINTER_STB_PORT GPIOA
+#define PRINTER_STB1_PIN GPIO_Pin_8
+#define PRINTER_STB2_PIN GPIO_Pin_9
+#define PRINTER_STB3_PIN GPIO_Pin_10
+#define PRINTER_STB4_PIN GPIO_Pin_11
+#define PRINTER_STB5_PIN GPIO_Pin_12
 #define PRINTER_STB6_PIN GPIO_Pin_15
 #define PRINTER_STB_PINS                                                                                               \
     PRINTER_STB1_PIN | PRINTER_STB2_PIN | PRINTER_STB3_PIN | PRINTER_STB4_PIN | PRINTER_STB5_PIN | PRINTER_STB6_PIN
 
+#define USE_CIRCLE_HEAT 1
+
 #define HEAT_TIME 20
 #define LAT_TIME 1
+
 #define DOTLINE_SIZE 48
+
+#define BlankDotLine 64 * 4
+
+#define WORD_SIZE 16
+#define LINE_SPACE WORD_SIZE + (uint8_t)(WORD_SIZE / 2) // 1.5行距
+#define SEGMENT_SPACE LINE_SPACE * 3                    // 3行距的段距
 
 /* PrinterMoto */
 #define PRINTER_MOTO_RCC_GPIO RCC_APB2Periph_GPIOB
@@ -62,5 +87,10 @@
 #define SERIAL_PINS_PORT GPIOA
 #define SERIAL_TX_PIN GPIO_Pin_2
 #define SERIAL_RX_PIN GPIO_Pin_3
+
+/* Instruction String */
+
+#define CMD_DEFAULT "CMD_DEFAULT" // 默认模式（打印字符）
+#define CMD_PIC "CMD_PIC"         // 打印图片
 
 #endif

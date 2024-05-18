@@ -1,10 +1,12 @@
+#include "FreeRTOS.h"
 #include "UserConfig.h"
+#include "queue.h"
 #include "stm32f10x.h"
+#include "task.h"
 #include <stdarg.h>
 #include <stdio.h>
 
-char serialReceiveString[100];
-uint8_t serialReceiveFlag;
+uint8_t serialReceiveString[MAX_PRINT_BYTE] = "";
 
 /**
  * @brief Serial initialization
@@ -84,27 +86,14 @@ int fputc(int ch, FILE *f)
     return ch;
 }
 
-uint8_t Serial_GetReceiveFlag(void)
-{
-    uint8_t tempFlag = 0;
-
-    if (serialReceiveFlag == 1)
-    {
-        serialReceiveFlag = 0;
-        tempFlag = 1;
-    }
-
-    return tempFlag;
-}
-
 void USART2_IRQHandler(void)
 {
     static uint8_t receiveState = 0;
-    static uint8_t receiveDataIdx = 0;
+    static uint16_t receiveDataIdx = 0;
     if (USART_GetITStatus(SERIAL_USART_X, USART_IT_RXNE) == SET)
     {
         uint8_t receiveByte = USART_ReceiveData(SERIAL_USART_X);
-        if (receiveState == 0 && serialReceiveFlag == 0)
+        if (receiveState == 0)
         {
             if (receiveByte == '@')
             {
@@ -127,9 +116,15 @@ void USART2_IRQHandler(void)
         {
             if (receiveByte == '\n')
             {
+                extern QueueHandle_t printMsgQueueHandle;
+                BaseType_t pxHigherPriorityTaskWoken = 0;
+
                 serialReceiveString[receiveDataIdx] = '\0';
                 receiveState = 0;
-                serialReceiveFlag = 1;
+
+                xQueueSendFromISR(printMsgQueueHandle, &serialReceiveString, &pxHigherPriorityTaskWoken);
+                // pxHigherPriorityTaskWoken如果被设置为true，那么需要进行上下文切换，确保直接返回到最高优先级的任务
+                portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
             }
         }
         USART_ClearITPendingBit(SERIAL_USART_X, USART_IT_RXNE);
