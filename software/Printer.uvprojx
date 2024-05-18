@@ -325,7 +325,7 @@
             <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>0</uSurpInc>
-            <uC99>0</uC99>
+            <uC99>1</uC99>
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
@@ -798,6 +798,31 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\Serial.h</FilePath>
             </File>
+            <File>
+              <FileName>MySPI2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\MySPI2.c</FilePath>
+            </File>
+            <File>
+              <FileName>MySPI2.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\MySPI2.h</FilePath>
+            </File>
+            <File>
+              <FileName>W25Q64.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\W25Q64.c</FilePath>
+            </File>
+            <File>
+              <FileName>W25Q64.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\W25Q64.h</FilePath>
+            </File>
+            <File>
+              <FileName>W25Q64_Ins.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\W25Q64_Ins.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -827,6 +852,11 @@
               <FileName>FreeRTOSConfig.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\User\FreeRTOSConfig.h</FilePath>
+            </File>
+            <File>
+              <FileName>UserConfig.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\User\UserConfig.h</FilePath>
             </File>
           </Files>
         </Group>
