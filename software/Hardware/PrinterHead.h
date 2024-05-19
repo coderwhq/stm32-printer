@@ -10,4 +10,8 @@ void PrinterHead_PrintBlankLine(void);
 void PrinterHead_PrintLineSpace(void);
 void PrinterHead_PrintSegmentSpace(void);
 
+void PrinterHead_RunDotLine(void);
+void PrinterHead_Heat_Custom(uint8_t selectSTB, uint8_t heatTime, uint8_t isCircleHeat);
+void PrinterHead_PrintDotLineCustom(uint8_t autoClear, uint8_t selectSTB, uint8_t heatTime, uint8_t isCircleHeat,
+                                    uint8_t autoRunDotLine);
 #endif
