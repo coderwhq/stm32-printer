@@ -106,10 +106,9 @@ void PrinterHead_ClearDotLineArray(void)
 void PrinterHead_SendDotLineData(uint8_t autoClear)
 {
     uint8_t i, j;
-    uint8_t temp;
     for (i = 0; i < DOTLINE_SIZE; i++)
     {
-        temp = MySPI_SwapByte(dotLine[i]);
+        MySPI_SwapByte(dotLine[i]);
     }
     PrinterHead_LAT_Enable();
     vTaskDelay(LAT_TIME);
