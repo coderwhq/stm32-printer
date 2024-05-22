@@ -33,6 +33,7 @@
 
 #define configSUPPORT_DYNAMIC_ALLOCATION 1 /* 使用自动分配，默认也是1 */
 #define configUSE_MUTEXES 1                /* 使用互斥量 */
+#define configTASK_NOTIFICATION_ARRAY_ENTRIES 8
 
 /*-----------------------------------------------------------
  * Application specific definitions.
