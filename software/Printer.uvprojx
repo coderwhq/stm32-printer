@@ -707,42 +707,10 @@
         </Group>
         <Group>
           <GroupName>System</GroupName>
-          <Files>
-            <File>
-              <FileName>Delay.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\System\Delay.c</FilePath>
-            </File>
-            <File>
-              <FileName>Delay.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\System\Delay.h</FilePath>
-            </File>
-            <File>
-              <FileName>SemaphoreMang.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\System\SemaphoreMang.c</FilePath>
-            </File>
-            <File>
-              <FileName>SemaphoreMang.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\System\SemaphoreMang.h</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>Hardware</GroupName>
           <Files>
-            <File>
-              <FileName>A4988.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\Hardware\A4988.c</FilePath>
-            </File>
-            <File>
-              <FileName>A4988.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\A4988.h</FilePath>
-            </File>
             <File>
               <FileName>LED.c</FileName>
               <FileType>1</FileType>
@@ -762,11 +730,6 @@
               <FileName>MySPI.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\MySPI.h</FilePath>
-            </File>
-            <File>
-              <FileName>FontBitmap.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>.\Hardware\FontBitmap.h</FilePath>
             </File>
             <File>
               <FileName>PrinterHead.c</FileName>
@@ -822,6 +785,16 @@
               <FileName>W25Q64_Ins.h</FileName>
               <FileType>5</FileType>
               <FilePath>.\Hardware\W25Q64_Ins.h</FilePath>
+            </File>
+            <File>
+              <FileName>Button.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\Button.c</FilePath>
+            </File>
+            <File>
+              <FileName>Button.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\Button.h</FilePath>
             </File>
           </Files>
         </Group>
