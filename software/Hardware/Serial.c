@@ -6,7 +6,10 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-uint8_t serialReceiveString[MAX_PRINT_BYTE] = "";
+// #define SERIAL_BUFFER_SIZE DOTLINE_SIZE_PIXELS
+// uint8_t serialRxBuffer[SERIAL_BUFFER_SIZE];
+
+uint8_t serialRxBuffer[MAX_RX_BYTE] = "";
 
 /**
  * @brief Serial initialization
@@ -90,40 +93,64 @@ void USART2_IRQHandler(void)
 {
     static uint8_t receiveState = 0;
     static uint16_t receiveDataIdx = 0;
+
     if (USART_GetITStatus(SERIAL_USART_X, USART_IT_RXNE) == SET)
     {
-        uint8_t receiveByte = USART_ReceiveData(SERIAL_USART_X);
-        if (receiveState == 0)
+
+        extern uint8_t currentPrintMode[];
+        if (strncmp(currentPrintMode, CMD_DEFAULT, strlen(CMD_DEFAULT)) == 0)
         {
-            if (receiveByte == '@')
+            uint8_t receiveByte = USART_ReceiveData(SERIAL_USART_X);
+            if (receiveState == 0)
             {
-                receiveState = 1;
-                receiveDataIdx = 0;
+                if (receiveByte == '@')
+                {
+                    receiveState = 1;
+                    receiveDataIdx = 0;
+                }
+            }
+            else if (receiveState == 1)
+            {
+                if (receiveByte == '\r')
+                {
+                    receiveState = 2;
+                }
+                else
+                {
+                    serialRxBuffer[receiveDataIdx++] = receiveByte;
+                }
+            }
+            else if (receiveState == 2)
+            {
+                if (receiveByte == '\n')
+                {
+                    extern QueueHandle_t printMsgQueueHandle;
+                    BaseType_t pxHigherPriorityTaskWoken = 0;
+
+                    serialRxBuffer[receiveDataIdx] = '\0';
+                    receiveState = 0;
+                    receiveDataIdx = 0;
+
+                    xQueueSendFromISR(printMsgQueueHandle, &serialRxBuffer, &pxHigherPriorityTaskWoken);
+                    // pxHigherPriorityTaskWoken如果被设置为true，那么需要进行上下文切换，确保直接返回到最高优先级的任务
+                    portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
+                }
             }
         }
-        else if (receiveState == 1)
+        else if (strncmp(currentPrintMode, CMD_PIC, strlen(CMD_PIC)) == 0)
         {
-            if (receiveByte == '\r')
-            {
-                receiveState = 2;
-            }
-            else
-            {
-                serialReceiveString[receiveDataIdx++] = receiveByte;
-            }
-        }
-        else if (receiveState == 2)
-        {
-            if (receiveByte == '\n')
+            uint8_t receiveByte = USART_ReceiveData(SERIAL_USART_X);
+
+            serialRxBuffer[receiveDataIdx++] = receiveByte;
+
+            if (receiveDataIdx >= MAX_RX_BYTE)
             {
                 extern QueueHandle_t printMsgQueueHandle;
                 BaseType_t pxHigherPriorityTaskWoken = 0;
 
-                serialReceiveString[receiveDataIdx] = '\0';
-                receiveState = 0;
+                receiveDataIdx = 0;
 
-                xQueueSendFromISR(printMsgQueueHandle, &serialReceiveString, &pxHigherPriorityTaskWoken);
-                // pxHigherPriorityTaskWoken如果被设置为true，那么需要进行上下文切换，确保直接返回到最高优先级的任务
+                xQueueSendFromISR(printMsgQueueHandle, &serialRxBuffer, &pxHigherPriorityTaskWoken);
                 portYIELD_FROM_ISR(pxHigherPriorityTaskWoken);
             }
         }

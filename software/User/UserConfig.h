@@ -3,7 +3,8 @@
 
 /* User Global */
 
-#define MAX_PRINT_BYTE 1024 // 最大能打印多少个字节
+// #define MAX_RX_BYTE 1024 // 最大能打印多少个字节
+#define MAX_RX_BYTE 384 // 最大能打印多少个字节
 #define FONTSIZE 32
 #define ASCII 0x1078D0L // ASCII字体在每种字体中的偏移量
 
@@ -13,6 +14,17 @@
 #define LED_RCC_GPIO RCC_APB2Periph_GPIOB
 #define LED_PORT GPIOB
 #define LED_PIN GPIO_Pin_0
+
+/* Button */
+#define BUTTON_RCC_GPIO RCC_APB2Periph_GPIOB
+#define BUTTON_RCC_AFIO RCC_APB2Periph_AFIO
+#define BUTTON_PORT GPIOB
+#define BUTTON_PIN GPIO_Pin_4
+#define BUTTON_EXTI_AFIO_PORT GPIO_PortSourceGPIOB
+#define BUTTON_EXTI_AFIO_LINE GPIO_PinSource4
+#define BUTTON_EXTI_LINE EXTI_Line4
+#define BUTTON_EXTI_CHANNEL EXTI4_IRQn
+#define BUTTON_EXTI_FUNCTION EXTI4_IRQHandler
 
 /* MySPI */
 #define USE_SPI_PERIPH 1 // 使用硬件SPI
@@ -56,14 +68,14 @@
 
 #define USE_CIRCLE_HEAT 1
 
-#define HEAT_TIME 20
-#define LAT_TIME 1
+#define HEAT_TIME 5 // 默认使用的加热时间 ms
+#define LAT_TIME 1  // ms
 
-#define DOTLINE_SIZE 48
-
+#define DOTLINE_SIZE 48 // Byte
+// #define DOTLINE_SIZE_PIXELS DOTLINE_SIZE * 8
 #define BlankDotLine 64 * 4
 
-#define WORD_SIZE 16
+#define WORD_SIZE FONTSIZE
 #define LINE_SPACE WORD_SIZE + (uint8_t)(WORD_SIZE / 2) // 1.5行距
 #define SEGMENT_SPACE LINE_SPACE * 3                    // 3行距的段距
 

@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 /* Hardware includes */
+#include "Button.h"
 #include "LED.h"
 #include "MySPI.h"
 #include "PrinterHead.h"
@@ -25,12 +26,16 @@ void ParsePrinterCommand(uint8_t *command);
 /* Task functions definitions */
 void AppTaskCreate(void *parameter);
 void PrintTask(void *parameters);
+void PrintPicTask(void *parameters);
 void WaitSerialRxTask(void *parameters);
+void RollPaperTask(void *parameters);
 
 /* Task functions handle definitions */
 TaskHandle_t appTaskCreateHandle = NULL;
 TaskHandle_t printTaskHandle = NULL;
+TaskHandle_t printPicTaskHandle = NULL;
 TaskHandle_t waitSerialRxTaskHandle = NULL;
+TaskHandle_t rollPaperTaskHandle = NULL;
 
 /* Semaphore handle */
 SemaphoreHandle_t serialSendDataMutexHandle = NULL;
@@ -39,7 +44,7 @@ SemaphoreHandle_t serialSendDataMutexHandle = NULL;
 QueueHandle_t printMsgQueueHandle = NULL;
 
 /* Other */
-uint8_t currentPrintMode[100] = CMD_DEFAULT; // 使用一个全局变量来维护当前打印机的打印模式
+uint8_t currentPrintMode[20] = CMD_DEFAULT; // 使用一个全局变量来维护当前打印机的打印模式
 
 int main(void)
 {
@@ -71,9 +76,10 @@ void Peripherals_Init(void)
 
     LED_Init();
     MySPI_Init();
-    Serial_Init(9600);
+    Serial_Init(115200);
     PrinterHead_Init(); // 内部已经对 moto 进行了初始化
     W25Q64_Init();      // 内部对SPI2进行了初始化
+    Button_Init();
 }
 
 void AppTaskCreate(void *parameter)
@@ -86,19 +92,35 @@ void AppTaskCreate(void *parameter)
     {
         /* 错误处理 */
     }
-    printMsgQueueHandle = xQueueCreate(10, MAX_PRINT_BYTE); // 最多10个打印任务或打印指令在队列中
+    /* 其实为了兼容 增加打印字符数并且能够打印图片
+     * 这两种情况最好是用两个队列，因为二者队列元素大小不一致，前者任意，后者固定为384，
+     * 这里为了方便选择了减少打印字符数使用一个队列
+     */
+    printMsgQueueHandle = xQueueCreate(10, MAX_RX_BYTE); // 最多10个打印任务或打印指令在队列中
     if (printMsgQueueHandle == NULL)
     {
         /* 错误处理 */
     }
 
-    xReturn = xTaskCreate(PrintTask, "PrintTask", 512, NULL, 9, &printTaskHandle);
+    xReturn = xTaskCreate(PrintTask, "PrintTask", 384, NULL, 9, &printTaskHandle);
     if (xReturn != pdPASS)
     {
         /* 错误处理 */
     }
 
-    xReturn = xTaskCreate(WaitSerialRxTask, "WaitSerialRxTask", 512, NULL, 99, &waitSerialRxTaskHandle);
+    xReturn = xTaskCreate(PrintPicTask, "PrintPicTask", 384, NULL, 9, &printPicTaskHandle);
+    if (xReturn != pdPASS)
+    {
+        /* 错误处理 */
+    }
+
+    xReturn = xTaskCreate(WaitSerialRxTask, "WaitSerialRxTask", 384, NULL, 5, &waitSerialRxTaskHandle);
+    if (xReturn != pdPASS)
+    {
+        /* 错误处理 */
+    }
+
+    xReturn = xTaskCreate(RollPaperTask, "RollPaperTask", 16, NULL, 3, &rollPaperTaskHandle);
     if (xReturn != pdPASS)
     {
         /* 错误处理 */
@@ -112,7 +134,7 @@ void WaitSerialRxTask(void *parameters)
 {
     while (1)
     {
-        uint8_t tempPeekBuffer[MAX_PRINT_BYTE];
+        uint8_t tempPeekBuffer[MAX_RX_BYTE];
         if (xQueuePeek(printMsgQueueHandle, &tempPeekBuffer, portMAX_DELAY) == pdTRUE) // peek不会让数据出队
         {
             if (strncmp(tempPeekBuffer, CMD_DEFAULT, strlen(CMD_DEFAULT)) == 0 ||
@@ -125,8 +147,15 @@ void WaitSerialRxTask(void *parameters)
             }
             else
             {
-                // 打印数据 通知打印任务进行打印
-                xTaskNotifyGiveIndexed(printTaskHandle, 0);
+                // 打印数据 根据不同的指令通知打印任务进行打印
+                if (strncmp(currentPrintMode, CMD_DEFAULT, strlen(CMD_DEFAULT)) == 0)
+                {
+                    xTaskNotifyGiveIndexed(printTaskHandle, 0);
+                }
+                else if (strncmp(currentPrintMode, CMD_PIC, strlen(CMD_PIC)) == 0)
+                {
+                    xTaskNotifyGiveIndexed(printPicTaskHandle, 0);
+                }
             }
         }
         vTaskDelay(20);
@@ -142,7 +171,7 @@ void PrintTask(void *parameters)
         ulTaskNotifyTakeIndexed(0, pdTRUE, portMAX_DELAY); // pdTRUE设置为二值模式
         LED_ON();                                          // 打印中……
 
-        uint8_t tempBuffer[MAX_PRINT_BYTE] = {0};
+        uint8_t tempBuffer[MAX_RX_BYTE] = {0};
 
         xQueueReceive(printMsgQueueHandle, &tempBuffer, portMAX_DELAY);
 
@@ -216,6 +245,7 @@ void PrintTask(void *parameters)
                 // 打印
                 memcpy(dotLine, lineWordBitmap, DOTLINE_SIZE);
                 PrinterHead_PrintDotLine();
+                // PrinterHead_PrintDotLineCustom(1, 0x3F, 30, 1, 1);
                 memset(lineWordBitmap, 0, sizeof(lineWordBitmap));
             }
             PrinterHead_PrintLineSpace();
@@ -231,8 +261,92 @@ void PrintTask(void *parameters)
     }
 }
 
+void PrintPicTask(void *parameters)
+{
+    while (1)
+    {
+        LED_OFF();                                         // 没有打印
+        ulTaskNotifyTakeIndexed(0, pdTRUE, portMAX_DELAY); // pdTRUE设置为二值模式
+        LED_ON();                                          // 打印中……
+
+        static uint16_t lineCount = 0;
+
+        uint8_t tempBuffer[MAX_RX_BYTE] = {0};
+        uint16_t i;
+        uint8_t j;
+
+        xQueueReceive(printMsgQueueHandle, &tempBuffer, portMAX_DELAY);
+
+        xSemaphoreTake(serialSendDataMutexHandle, portMAX_DELAY);
+        printf("请稍等，正在打印图片…… \r\n");
+        xSemaphoreGive(serialSendDataMutexHandle);
+
+        for (j = 1; j <= 8; j++)
+        {
+            uint16_t p = 0;
+            for (i = 0; i < MAX_RX_BYTE; i++)
+            {
+                if (tempBuffer[i] >= ((j - 1) * 0x20) && tempBuffer[i] < (j * 0x20))
+                {
+                    uint8_t n = i / 8;
+                    uint8_t m = i % 8;
+                    dotLine[n] |= (0x80 >> m);
+                }
+            }
+            PrinterHead_PrintDotLineCustom(1, 0x3F, (8 - j + 1) * 0.625, 1, 0); // 加热时间 0.625 ~ 5 (7V) 5 ~ 40 (5V)
+        }
+        PrinterHead_RunDotLine();
+
+        xSemaphoreTake(serialSendDataMutexHandle, portMAX_DELAY);
+        printf("一点行打印完成\r\n");
+        xSemaphoreGive(serialSendDataMutexHandle);
+
+        lineCount++;
+        // 图片打印完成自动切换回默认模式
+        if (lineCount >= MAX_RX_BYTE) // 换成行数，目前先固定和列数一样
+        {
+            lineCount = 0;
+            PrinterHead_PrintSegmentSpace();
+
+            memcpy(currentPrintMode, CMD_DEFAULT, strlen(CMD_DEFAULT)); // 更改为最新的打印模式
+
+            xSemaphoreTake(serialSendDataMutexHandle, portMAX_DELAY);
+            printf("图片打印完成。\r\n自动切换至模式：%s \r\n", currentPrintMode);
+            xSemaphoreGive(serialSendDataMutexHandle);
+        }
+
+        Serial_SendByte(0xFF); // 通知发送端已经处理好一点行的打印
+
+        vTaskDelay(20);
+    }
+}
+
+void RollPaperTask(void *parameters)
+{
+    while (1)
+    {
+        ulTaskNotifyTakeIndexed(0, pdTRUE, portMAX_DELAY);
+
+        xSemaphoreTake(serialSendDataMutexHandle, portMAX_DELAY);
+        printf("滚纸中…… \r\n");
+        xSemaphoreGive(serialSendDataMutexHandle);
+
+        for (uint8_t i = 0; i < 8; i++)
+        {
+            PrinterHead_PrintSegmentSpace();
+        }
+
+        xSemaphoreTake(serialSendDataMutexHandle, portMAX_DELAY);
+        printf("滚纸完毕 \r\n");
+        xSemaphoreGive(serialSendDataMutexHandle);
+
+        vTaskDelay(20);
+    }
+}
+
 void ParsePrinterCommand(uint8_t *command)
 {
+    memset(currentPrintMode, 0, sizeof(currentPrintMode));
     memcpy(currentPrintMode, command, strlen(command)); // 更改为最新的打印模式
 
     xSemaphoreTake(serialSendDataMutexHandle, portMAX_DELAY);

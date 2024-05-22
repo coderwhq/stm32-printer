@@ -78,10 +78,12 @@ uint8_t MySPI_SwapByte(uint8_t byte)
     {
     }
     SPI_I2S_SendData(SPI_X, byte);
+    /*
     while (SPI_I2S_GetFlagStatus(SPI_X, SPI_I2S_FLAG_RXNE) != SET) // 接收缓冲区为空时等待
     {
     }
     return SPI_I2S_ReceiveData(SPI_X);
+    */
 
 #else
     /* 软件模拟SPI交换字节 */

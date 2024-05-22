@@ -103,23 +103,25 @@ void PrinterHead_ClearDotLineArray(void)
     }
 }
 
-void PrinterHead_SendDotLineData(void)
+void PrinterHead_SendDotLineData(uint8_t autoClear)
 {
     uint8_t i, j;
-    uint8_t temp;
     for (i = 0; i < DOTLINE_SIZE; i++)
     {
-        temp = MySPI_SwapByte(dotLine[i]);
+        MySPI_SwapByte(dotLine[i]);
     }
     PrinterHead_LAT_Enable();
     vTaskDelay(LAT_TIME);
     PrinterHead_LAT_Disable();
-    PrinterHead_ClearDotLineArray(); // 自动清除dotLine，方便外界继续向dotLine中放入数据
+    if (autoClear != 0)
+    {
+        PrinterHead_ClearDotLineArray(); // 自动清除dotLine，方便外界继续向dotLine中放入数据
+    }
 }
 
 void PrinterHead_PrintDotLine(void)
 {
-    PrinterHead_SendDotLineData();
+    PrinterHead_SendDotLineData(1); // 自动清除dotLine
 
 #if !USE_CIRCLE_HEAT
     PrinterHead_Heat_Enable();
@@ -145,4 +147,55 @@ void PrinterHead_PrintLineSpace(void)
 void PrinterHead_PrintSegmentSpace(void)
 {
     PrinterMoto_Run_Circle(SEGMENT_SPACE);
+}
+
+void PrinterHead_RunDotLine(void)
+{
+    PrinterMoto_Run_Circle(4);
+}
+
+void PrinterHead_Heat_Custom(uint8_t selectSTB, uint8_t heatTime, uint8_t isCircleHeat)
+{
+    uint16_t tempSTBPins[] = {PRINTER_STB1_PIN, PRINTER_STB2_PIN, PRINTER_STB3_PIN,
+                              PRINTER_STB4_PIN, PRINTER_STB5_PIN, PRINTER_STB6_PIN};
+    if (isCircleHeat)
+    {
+        //  根据selectSTB加热 1到6位依次控制 STB1~STB6
+        for (uint8_t i = 0; i < 6; i++)
+        {
+            if (selectSTB & (0x01 << i))
+            {
+                GPIO_WriteBit(PRINTER_STB_PORT, tempSTBPins[i], (BitAction)1); // Enable
+                vTaskDelay(heatTime);
+                GPIO_WriteBit(PRINTER_STB_PORT, tempSTBPins[i], (BitAction)0); // Disable
+            }
+        }
+    }
+    else
+    {
+        uint16_t portVal = 0x0000;
+        for (uint8_t i = 0; i < 6; i++)
+        {
+            if (selectSTB & (0x01 << i))
+            {
+                portVal |= tempSTBPins[i];
+            }
+        }
+        GPIO_Write(PRINTER_STB_PORT, portVal);
+        vTaskDelay(heatTime);
+        GPIO_Write(PRINTER_STB_PORT, portVal);
+    }
+}
+
+void PrinterHead_PrintDotLineCustom(uint8_t autoClear, uint8_t selectSTB, uint8_t heatTime, uint8_t isCircleHeat,
+                                    uint8_t autoRunDotLine)
+{
+    PrinterHead_SendDotLineData(autoClear);
+
+    PrinterHead_Heat_Custom(selectSTB, heatTime, isCircleHeat);
+
+    if (autoRunDotLine != 0)
+    {
+        PrinterMoto_Run_Circle(4);
+    }
 }
