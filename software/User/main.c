@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 /* Hardware includes */
+#include "BlueTooth.h"
 #include "Button.h"
 #include "LED.h"
 #include "MySPI.h"
@@ -45,13 +46,13 @@ QueueHandle_t printMsgQueueHandle = NULL;
 
 /* Other */
 uint8_t currentPrintMode[20] = CMD_DEFAULT; // 使用一个全局变量来维护当前打印机的打印模式
+uint8_t currentRxType[20] = "";             // Serial  串口   Bluetooth  蓝牙
 
 int main(void)
 {
     BaseType_t xReturn = pdPASS;
 
     Peripherals_Init();
-
     printf("Peripherals Init finished. \r\n");
 
     xReturn = xTaskCreate(AppTaskCreate, "AppTaskCreate", 128, NULL, 1, &appTaskCreateHandle);
@@ -80,6 +81,7 @@ void Peripherals_Init(void)
     PrinterHead_Init(); // 内部已经对 moto 进行了初始化
     W25Q64_Init();      // 内部对SPI2进行了初始化
     Button_Init();
+    BlueTooth_Init(9600);
 }
 
 void AppTaskCreate(void *parameter)
@@ -314,9 +316,14 @@ void PrintPicTask(void *parameters)
             printf("图片打印完成。\r\n自动切换至模式：%s \r\n", currentPrintMode);
             xSemaphoreGive(serialSendDataMutexHandle);
         }
-
-        Serial_SendByte(0xFF); // 通知发送端已经处理好一点行的打印
-
+        if (strncmp(currentRxType, RXTYPE_SERIAL, strlen(RXTYPE_SERIAL)) == 0)
+        {
+            Serial_SendByte(0xFF); // 通知发送端已经处理好一点行的打印
+        }
+        else if (strncmp(currentRxType, RXTYPE_BLUETOOTH, strlen(RXTYPE_BLUETOOTH)) == 0)
+        {
+            BlueTooth_SendByte(0xFF);
+        }
         vTaskDelay(20);
     }
 }

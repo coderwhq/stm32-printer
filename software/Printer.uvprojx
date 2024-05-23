@@ -796,6 +796,16 @@
               <FileType>5</FileType>
               <FilePath>.\Hardware\Button.h</FilePath>
             </File>
+            <File>
+              <FileName>BlueTooth.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\Hardware\BlueTooth.c</FilePath>
+            </File>
+            <File>
+              <FileName>BlueTooth.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\Hardware\BlueTooth.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
