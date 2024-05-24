@@ -7,7 +7,8 @@
 #define MAX_RX_BYTE 384 // 最大能打印多少个字节
 #define FONTSIZE 32
 #define ASCII 0x1078D0L // ASCII字体在每种字体中的偏移量
-
+#define RXTYPE_SERIAL "Serial"
+#define RXTYPE_BLUETOOTH "Bluetooth"
 /* LED */
 #define ACTIVE_HIGH_LEVEL 0
 
@@ -100,6 +101,15 @@
 #define SERIAL_TX_PIN GPIO_Pin_2
 #define SERIAL_RX_PIN GPIO_Pin_3
 
+/* BlueTooth */
+#define BLUE_TOOTH_USART_X USART3
+
+#define BLUE_TOOTH_RCC_GPIO RCC_APB2Periph_GPIOB
+#define BLUE_TOOTH_RCC RCC_APB1Periph_USART3
+
+#define BLUE_TOOTH_PORT GPIOB
+#define BLUE_TOOTH_TX_PIN GPIO_Pin_10
+#define BLUE_TOOTH_RX_PIN GPIO_Pin_11
 /* Instruction String */
 
 #define CMD_DEFAULT "CMD_DEFAULT" // 默认模式（打印字符）

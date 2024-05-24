@@ -146,7 +146,10 @@ void USART2_IRQHandler(void)
             if (receiveDataIdx >= MAX_RX_BYTE)
             {
                 extern QueueHandle_t printMsgQueueHandle;
+                extern uint8_t currentRxType[];
                 BaseType_t pxHigherPriorityTaskWoken = 0;
+
+                memcpy(currentRxType, RXTYPE_SERIAL, strlen(RXTYPE_SERIAL));
 
                 receiveDataIdx = 0;
 
